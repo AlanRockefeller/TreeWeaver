@@ -25,15 +25,16 @@ class SettingsManager:
             "external_tool_options": {
                 "mafft_threads": 1,
                 "raxmlng_threads": 1,
-                "iqtree_threads": 1,      # For general IQ-TREE runs, including ModelFinder for now
-                "modeltest_ng_threads": 1 # For ModelTest-NG runs
+                "iqtree_threads": 1,
+                "modeltest_ng_threads": 1
             },
             "visualization": {
-                "font_family": "Arial",
-                "font_size": 10,
-                "line_thickness": 1
+                "font_family": "Arial", # Default font
+                "font_size": 8,         # Default font size for tree labels
+                "line_thickness": 1.0,  # Default line thickness for tree branches
+                "show_confidence_values": True # Default to show confidence values
             },
-            "user_paths": { # For remembering last used directories
+            "user_paths": {
                 "last_import_dir": os.path.expanduser("~"),
                 "last_export_dir": os.path.expanduser("~"),
                 "last_settings_tool_path_dir": os.path.expanduser("~") # For tool path browsing

@@ -35,9 +35,13 @@ __all__ = [
     # Phylogenetics
     'create_phylip_with_internal_ids',
     'map_raxml_tree_tips_to_original_ids',
+    # Help Manager
+    'get_help_html',
 ]
 
 import logging
+from .help_manager import get_help_html # Ensure this is imported to be exportable
+
 # Set up a default null handler for the library to avoid 'No handler found' warnings
 # if the application using this library doesn't configure logging.
 # The application itself (treeweaver.py) will configure the actual handlers.

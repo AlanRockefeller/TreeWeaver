@@ -1,46 +1,76 @@
 # This module defines the panel for displaying loaded sequence information.
 
 import logging
-from PyQt6.QtWidgets import QDockWidget, QListWidget, QVBoxLayout, QWidget, QLabel, QListWidgetItem
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QDockWidget, QListWidget, QVBoxLayout, QWidget, QLabel, QListWidgetItem, QMenu
+from PyQt6.QtCore import Qt, pyqtSignal, QPoint
 
-# Assuming treeweaver.core.data_structures.SequenceData is available
-# We need to handle the case where treeweaver.core might not be in the path
-# if running this file directly for testing, but for application runs, it should be.
 try:
-    from treeweaver.core import SequenceData, SequenceRecord # Use SequenceRecord for type hint
+    from treeweaver.core import SequenceData, SequenceRecord
 except ImportError:
-    # Fallback for direct testing or if imports are tricky during development phases
-    # This allows the class to be defined, but it won't function correctly without SequenceData
     logging.warning("Could not import SequenceData from treeweaver.core. SequencePanel may not work as expected.")
     SequenceData = None # type: ignore
     SequenceRecord = None # type: ignore
-
 
 logger = logging.getLogger(__name__)
 
 class SequencePanel(QDockWidget):
     """
     A dockable widget that displays a list of loaded sequences.
+    Emits a signal when an edit is requested for a sequence.
     """
+    edit_sequence_requested = pyqtSignal(str) # Signal to emit the ID of the sequence to edit
+
     def __init__(self, title: str = "Loaded Sequences", parent: QWidget = None):
         super().__init__(title, parent)
-        self.setObjectName("SequencePanelDock") # Important for saving/restoring dock widget state
-
+        self.setObjectName("SequencePanelDock")
         self.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
 
-        # Main widget for the dock
         self._main_widget = QWidget()
         self._layout = QVBoxLayout(self._main_widget)
 
         self._list_widget = QListWidget()
         self._list_widget.setObjectName("SequenceListWidget")
-        # self._list_widget.itemDoubleClicked.connect(self._on_item_double_clicked) # Example future connection
+
+        # Context Menu for editing
+        self._list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._list_widget.customContextMenuRequested.connect(self._show_context_menu)
+
+        # self._list_widget.itemDoubleClicked.connect(self._handle_double_click) # Alternative edit trigger
 
         self._layout.addWidget(self._list_widget)
-        self.setWidget(self._main_widget) # Set the QWidget as the content of the QDockWidget
+        self.setWidget(self._main_widget)
 
-        logger.info("SequencePanel initialized.")
+        logger.info("SequencePanel initialized with context menu.")
+
+    # def _handle_double_click(self, item: QListWidgetItem):
+    #     """Handles double-click on a list item to trigger edit."""
+    #     if item:
+    #         seq_id = item.data(Qt.ItemDataRole.UserRole)
+    #         if seq_id:
+    #             self.edit_sequence_requested.emit(seq_id)
+
+    def _show_context_menu(self, point: QPoint):
+        """Shows a context menu for the clicked list item."""
+        item = self._list_widget.itemAt(point)
+        if item:
+            seq_id = item.data(Qt.ItemDataRole.UserRole)
+            if not seq_id:
+                logger.warning("No sequence ID found for the selected list item.")
+                return
+
+            menu = QMenu()
+            edit_action = menu.addAction("Edit Sequence...")
+            # remove_action = menu.addAction("Remove Sequence") # Future: Implement remove
+
+            action = menu.exec(self._list_widget.mapToGlobal(point))
+
+            if action == edit_action:
+                self.edit_sequence_requested.emit(seq_id)
+            # elif action == remove_action:
+            #     # self.remove_sequence_requested.emit(seq_id) # Need another signal
+            #     logger.debug(f"Remove requested for {seq_id} (not implemented yet)")
+            #     pass
+
 
     def update_sequences(self, sequence_data: SequenceData) -> None:
         """

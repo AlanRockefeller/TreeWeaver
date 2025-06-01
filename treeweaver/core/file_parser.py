@@ -148,10 +148,17 @@ def write_sequences(sequence_data: SequenceData, filepath: str, file_format: SEQ
         # For NEXUS, SeqIO can write basic sequence data. For more complex Nexus files (trees, charsets, etc.),
         # one would use Bio.Nexus.Nexus objects directly.
         count = SeqIO.write(bio_records, filepath, file_format)
+        if count == 0:
+            logger.warning(f"No sequences were written to {filepath} for format {file_format} (input might have been empty or filtered).")
+            # Still consider it a successful write operation if no error, but 0 records.
+            # Or return False if 0 records written is an issue. For now, True if no exception.
         logger.info(f"Successfully wrote {count} sequences to '{filepath}' in {file_format} format.")
         return True
-    except Exception as e:
-        logger.error(f"Error writing sequences to '{filepath}' in {file_format} format: {e}")
+    except (IOError, PermissionError) as e:
+        logger.error(f"File system error writing sequences to '{filepath}' in {file_format} format: {e}", exc_info=True)
+        return False
+    except Exception as e: # Catch other potential errors from SeqIO.write or elsewhere
+        logger.error(f"Unexpected error writing sequences to '{filepath}' in {file_format} format: {e}", exc_info=True)
         return False
 
 # Specific writer functions for convenience
@@ -211,8 +218,11 @@ def write_newick(tree: Phylo.BaseTree.Tree, filepath: str) -> bool:
         Phylo.write(tree, filepath, "newick")
         logger.info(f"Successfully wrote tree to '{filepath}' in Newick format.")
         return True
-    except Exception as e:
-        logger.error(f"Error writing Newick tree to '{filepath}': {e}")
+    except (IOError, PermissionError) as e:
+        logger.error(f"File system error writing Newick tree to '{filepath}': {e}", exc_info=True)
+        return False
+    except Exception as e: # Catch other potential errors from Phylo.write
+        logger.error(f"Unexpected error writing Newick tree to '{filepath}': {e}", exc_info=True)
         return False
 
 
