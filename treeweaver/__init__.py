@@ -7,7 +7,7 @@ from .config import settings_manager
 __all__ = [
     'settings_manager',
     # Add other core components here as they are developed, e.g.:
-    # 'MainWindow',
+    # 'MainWindow', 
     # 'core_function_x',
 ]
 

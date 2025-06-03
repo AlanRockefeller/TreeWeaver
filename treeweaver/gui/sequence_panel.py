@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QDockWidget, QListWidget, QVBoxLayout, QWidget, QLab
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint
 
 try:
-    from treeweaver.core import SequenceData, SequenceRecord
+    from treeweaver.core import SequenceData, SequenceRecord 
 except ImportError:
     logging.warning("Could not import SequenceData from treeweaver.core. SequencePanel may not work as expected.")
     SequenceData = None # type: ignore
@@ -22,15 +22,15 @@ class SequencePanel(QDockWidget):
 
     def __init__(self, title: str = "Loaded Sequences", parent: QWidget = None):
         super().__init__(title, parent)
-        self.setObjectName("SequencePanelDock")
+        self.setObjectName("SequencePanelDock") 
         self.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
-
+        
         self._main_widget = QWidget()
         self._layout = QVBoxLayout(self._main_widget)
-
+        
         self._list_widget = QListWidget()
         self._list_widget.setObjectName("SequenceListWidget")
-
+        
         # Context Menu for editing
         self._list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._list_widget.customContextMenuRequested.connect(self._show_context_menu)
@@ -38,7 +38,7 @@ class SequencePanel(QDockWidget):
         # self._list_widget.itemDoubleClicked.connect(self._handle_double_click) # Alternative edit trigger
 
         self._layout.addWidget(self._list_widget)
-        self.setWidget(self._main_widget)
+        self.setWidget(self._main_widget) 
 
         logger.info("SequencePanel initialized with context menu.")
 
@@ -83,7 +83,7 @@ class SequencePanel(QDockWidget):
         if not SequenceData: # Check if the import failed
             logger.error("SequenceData type not available. Cannot update sequences.")
             return
-
+            
         if not sequence_data:
             logger.warning("update_sequences called with None sequence_data.")
             return
@@ -95,7 +95,7 @@ class SequencePanel(QDockWidget):
             item.setData(Qt.ItemDataRole.UserRole, seq_record.id) # Store original ID for later use
             item.setToolTip(f"ID: {seq_record.id}\nLength: {seq_record.length}bp\nDescription: {seq_record.description}")
             self._list_widget.addItem(item)
-
+        
         if self._list_widget.count() > 0:
             logger.info(f"Sequence panel updated. Displaying {self._list_widget.count()} sequences.")
         else:
@@ -145,7 +145,7 @@ if __name__ == '__main__':
                 self.sequences.append(MockSequenceRecord(id, seq, desc))
             def get_all_sequences(self):
                 return self.sequences
-
+        
         SequenceData = MockSequenceData # type: ignore
         SequenceRecord = MockSequenceRecord # type: ignore
 
@@ -163,7 +163,7 @@ if __name__ == '__main__':
         QListWidget::item:selected { background-color: #555555; }
     """
     app.setStyleSheet(dark_stylesheet_test)
-
+    
     main_win = QMainWindow()
     main_win.setWindowTitle("Sequence Panel Test")
     main_win.setGeometry(100, 100, 800, 600)

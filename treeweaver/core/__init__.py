@@ -9,7 +9,7 @@ from .file_parser import (
     write_nexus,
     parse_newick,
     write_newick,
-    SEQ_FORMAT_TYPE
+    SEQ_FORMAT_TYPE 
 )
 from .phylogenetics import (
     create_phylip_with_internal_ids,

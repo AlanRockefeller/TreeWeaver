@@ -3,14 +3,14 @@ import sys
 import os
 import re # For sequence validation
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, 
     QFileDialog, QGroupBox, QFormLayout, QMessageBox, QWidget, QTabWidget,
-    QSpinBox, QDialogButtonBox, QCheckBox,
-    QFontComboBox, QDoubleSpinBox,
-    QTextEdit, QPlainTextEdit
+    QSpinBox, QDialogButtonBox, QCheckBox, 
+    QFontComboBox, QDoubleSpinBox, 
+    QTextEdit, QPlainTextEdit 
 )
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont, QTextOption
+from PyQt6.QtGui import QFont, QTextOption 
 
 from treeweaver.config import settings_manager
 from treeweaver.core.help_manager import get_help_html # Import help content getter
@@ -23,8 +23,8 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Settings")
-        self.setMinimumWidth(600)
-        self.current_settings = settings_manager.load_settings()
+        self.setMinimumWidth(600) 
+        self.current_settings = settings_manager.load_settings() 
         main_layout = QVBoxLayout(self)
         tab_widget = QTabWidget(self)
         main_layout.addWidget(tab_widget)
@@ -33,7 +33,7 @@ class SettingsDialog(QDialog):
         tools_main_layout = QVBoxLayout(tools_tab)
         tools_paths_group_box = QGroupBox("External Tool Paths")
         tools_paths_layout = QFormLayout(); tools_paths_group_box.setLayout(tools_paths_layout)
-        self.tool_path_edits = {}
+        self.tool_path_edits = {} 
         default_tool_paths = settings_manager.default_settings.get("external_tool_paths", {})
         for tool_name in default_tool_paths.keys():
             current_path = self.current_settings.get("external_tool_paths", {}).get(tool_name, "")
@@ -51,7 +51,7 @@ class SettingsDialog(QDialog):
         default_tool_options = settings_manager.default_settings.get("external_tool_options", {})
         for option_key, default_value in default_tool_options.items():
             current_value = self.current_settings.get("external_tool_options", {}).get(option_key, default_value)
-            sb = QSpinBox(); sb.setMinimum(1); sb.setMaximum(os.cpu_count() or 64)
+            sb = QSpinBox(); sb.setMinimum(1); sb.setMaximum(os.cpu_count() or 64) 
             try: sb.setValue(int(current_value))
             except ValueError: sb.setValue(int(default_value)); logger.warning(f"Invalid value for {option_key}")
             self.tool_option_edits[option_key] = sb
@@ -69,14 +69,14 @@ class SettingsDialog(QDialog):
         self.font_size_spinbox = QSpinBox(); self.font_size_spinbox.setMinimum(6); self.font_size_spinbox.setMaximum(24)
         self.font_size_spinbox.setValue(settings_manager.get_setting("visualization.font_size", 8))
         viz_layout.addRow(QLabel("Font Size (Tree Labels):"), self.font_size_spinbox)
-        self.line_thickness_spinbox = QDoubleSpinBox(); self.line_thickness_spinbox.setMinimum(0.5)
+        self.line_thickness_spinbox = QDoubleSpinBox(); self.line_thickness_spinbox.setMinimum(0.5) 
         self.line_thickness_spinbox.setMaximum(5.0); self.line_thickness_spinbox.setSingleStep(0.1)
         self.line_thickness_spinbox.setDecimals(1)
         self.line_thickness_spinbox.setValue(settings_manager.get_setting("visualization.line_thickness", 1.0))
         viz_layout.addRow(QLabel("Line Thickness (Tree Branches):"), self.line_thickness_spinbox)
         self.show_confidence_checkbox = QCheckBox("Show confidence values on tree")
         self.show_confidence_checkbox.setChecked(settings_manager.get_setting("visualization.show_confidence_values", True))
-        viz_layout.addRow(self.show_confidence_checkbox)
+        viz_layout.addRow(self.show_confidence_checkbox) 
         viz_tab.setLayout(viz_layout)
         tab_widget.addTab(viz_tab, "Visualization")
         # --- Dialog Buttons ---
@@ -111,7 +111,7 @@ class SettingsDialog(QDialog):
         if settings_manager.save_settings(self.current_settings):
             logger.info("Settings saved successfully via dialog.")
             QMessageBox.information(self, "Settings Saved", "Your settings have been saved.")
-            self.accept()
+            self.accept() 
         else:
             logger.error("Failed to save settings via dialog.")
             QMessageBox.critical(self, "Error Saving Settings", "Could not save settings.")
@@ -125,12 +125,12 @@ class RaxmlDialog(QDialog):
         self.model_edit = QLineEdit(current_model)
         form_layout.addRow(QLabel("Substitution Model:"), self.model_edit)
         self.bootstrap_spinbox = QSpinBox(); self.bootstrap_spinbox.setMinimum(0)
-        self.bootstrap_spinbox.setMaximum(10000); self.bootstrap_spinbox.setValue(100)
+        self.bootstrap_spinbox.setMaximum(10000); self.bootstrap_spinbox.setValue(100) 
         form_layout.addRow(QLabel("Bootstrap Replicates:"), self.bootstrap_spinbox)
         self.prefix_edit = QLineEdit("TreeWeaver_RAxML")
         form_layout.addRow(QLabel("Output Prefix:"), self.prefix_edit)
         self.threads_spinbox = QSpinBox(); self.threads_spinbox.setMinimum(1)
-        self.threads_spinbox.setMaximum(os.cpu_count() or 64)
+        self.threads_spinbox.setMaximum(os.cpu_count() or 64) 
         default_threads = settings_manager.get_setting("external_tool_options.raxmlng_threads", 1)
         try: self.threads_spinbox.setValue(int(default_threads))
         except ValueError: self.threads_spinbox.setValue(1); logger.warning(f"Invalid raxmlng_threads value")
@@ -173,7 +173,7 @@ class SequenceEditDialog(QDialog):
         self.seq_edit.setFont(monospace_font)
         self.seq_edit.setMinimumHeight(200) # Ensure enough space for sequence
         form_layout.addRow(QLabel("Sequence Data:"), self.seq_edit)
-
+        
         layout.addLayout(form_layout)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
@@ -194,9 +194,9 @@ class SequenceEditDialog(QDialog):
         if new_id_val != self.original_id and new_id_val in self.other_existing_ids:
             QMessageBox.warning(self, "Validation Error", f"Sequence ID '{new_id_val}' already exists.")
             return
-
+        
         if not self.VALID_SEQ_CHARS_REGEX.match(new_seq_val) and new_seq_val: # Allow empty seq? For now, no.
-            QMessageBox.warning(self, "Validation Error",
+            QMessageBox.warning(self, "Validation Error", 
                                 "Sequence data contains invalid characters.\n"
                                 "Allowed: A,C,G,T,U,N,R,Y,W,S,M,K,B,D,H,V, and gap characters like -,?.")
             return
@@ -219,13 +219,13 @@ class SequenceEditDialog(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    logging.basicConfig(level=logging.DEBUG)
-
+    logging.basicConfig(level=logging.DEBUG) 
+    
     # Test SequenceEditDialog
     existing_ids_test = ["existing_seq1", "another_id", "test_seq_to_edit"]
     seq_edit_dialog = SequenceEditDialog("test_seq_to_edit", "ATGCGTN-?", existing_ids_test)
     if seq_edit_dialog.exec() == QDialog.DialogCode.Accepted:
-        new_id, new_seq = seq_edit_dialog.get_validated_data()
+        new_id, new_seq = seq_edit_dialog.get_validated_data() 
         logger.info(f"Sequence Edit Dialog Accepted. New ID: {new_id}, New Seq: {new_seq[:30]}...")
     else:
         logger.info("Sequence Edit Dialog Cancelled.")
@@ -242,7 +242,7 @@ class HelpDialog(QDialog):
 
         self.text_browser = QTextBrowser()
         self.text_browser.setOpenExternalLinks(True) # For any http links in MD
-
+        
         try:
             html_content = get_help_html()
             self.text_browser.setHtml(html_content)
@@ -262,8 +262,8 @@ class HelpDialog(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    logging.basicConfig(level=logging.DEBUG)
-
+    logging.basicConfig(level=logging.DEBUG) 
+    
     # Test HelpDialog
     help_dialog = HelpDialog()
     help_dialog.exec() # Use exec for modal dialog test
@@ -272,9 +272,9 @@ if __name__ == '__main__':
     # existing_ids_test = ["existing_seq1", "another_id", "test_seq_to_edit"]
     # seq_edit_dialog = SequenceEditDialog("test_seq_to_edit", "ATGCGTN-?", existing_ids_test)
     # if seq_edit_dialog.exec() == QDialog.DialogCode.Accepted:
-    #     new_id, new_seq = seq_edit_dialog.get_validated_data()
+    #     new_id, new_seq = seq_edit_dialog.get_validated_data() 
     #     logger.info(f"Sequence Edit Dialog Accepted. New ID: {new_id}, New Seq: {new_seq[:30]}...")
     # else:
     #     logger.info("Sequence Edit Dialog Cancelled.")
-
+    
     sys.exit() # Exit after HelpDialog test for this example

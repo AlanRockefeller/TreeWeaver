@@ -1,0 +1,13 @@
+name: treeweaver-env
+channels:
+  - conda-forge # Prioritize conda-forge for better compatibility, especially for matplotlib/numpy
+  - defaults
+dependencies:
+  - python=3.10 # Specify a Python version
+  - pyqt>=6.0,<7.0 # PyQt6 from conda-forge is usually named pyqt
+  - biopython>=1.79,<2.0
+  - matplotlib>=3.5,<4.0
+  - numpy<2.0 # Explicitly keep numpy < 2 for broader matplotlib compatibility from default channels if conda-forge one isn't picked up first for some reason
+  - markdown>=3.0,<4.0
+  - pip # Include pip in case some packages are only on PyPI or for user's future needs
+  # Add any other implicit dependencies if known, otherwise let conda resolve

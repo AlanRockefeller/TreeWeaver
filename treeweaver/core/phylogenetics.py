@@ -33,7 +33,7 @@ def create_phylip_with_internal_ids(sequence_data: SequenceData, output_phylip_p
         if len(internal_id_str) > 10:
             logger.warning(f"Internal ID '{internal_id_str}' is longer than 10 characters. "
                            "This might be an issue for strict PHYLIP parsers, but RAxML-NG should be okay.")
-
+        
         bio_srec = BioSeqRecord(Seq(seq_rec.sequence), id=internal_id_str, description="")
         biopython_records.append(bio_srec)
 
@@ -62,7 +62,7 @@ def map_raxml_tree_tips_to_original_ids(tree: Phylo.BaseTree.Tree, sequence_data
     """
     if not tree:
         logger.error("No tree provided for tip name mapping.")
-        return None
+        return None 
     if not sequence_data:
         logger.error("No sequence data provided for tip name mapping.")
         return tree # Return tree unmodified if no mapping data
@@ -90,10 +90,10 @@ if __name__ == '__main__':
     from io import StringIO
 
     sd = SequenceData()
-    s1 = sd.add_sequence("SeqA_human", "ATGCGT")
-    s2 = sd.add_sequence("SeqB_mouse", "GATTACA")
-    s3 = sd.add_sequence("SeqC_chimp", "AGCTAGCT")
-
+    s1 = sd.add_sequence("SeqA_human", "ATGCGT") 
+    s2 = sd.add_sequence("SeqB_mouse", "GATTACA") 
+    s3 = sd.add_sequence("SeqC_chimp", "AGCTAGCT") 
+    
     if not (s1 and s2 and s3): logger.error("Failed to add sequences for testing."); exit()
 
     with tempfile.TemporaryDirectory() as tmpdir:

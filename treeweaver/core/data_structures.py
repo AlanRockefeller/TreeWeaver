@@ -78,11 +78,11 @@ class SequenceData:
         self._next_internal_id += 1
 
         record = SequenceRecord(seq_id=seq_id, sequence=sequence, internal_id=internal_id, description=description)
-
+        
         self._sequences[record.id] = record
         self._internal_id_map[record.internal_id] = record.id
         self._original_id_to_internal[record.id] = record.internal_id
-
+        
         logger.info(f"Added sequence: ID='{record.id}', InternalID={record.internal_id}, Length={record.length}")
         return record
 
@@ -146,18 +146,18 @@ class SequenceData:
         if new_id in self._sequences:
             logger.error(f"New sequence ID '{new_id}' already exists. Cannot update '{old_id}'.")
             return False
-
+        
         record = self._sequences.get(old_id)
         if record:
             # Update the record itself
             record.update_id(new_id)
-
+            
             # Update keys in internal maps
             self._sequences[new_id] = self._sequences.pop(old_id)
             self._internal_id_map[record.internal_id] = new_id
             self._original_id_to_internal.pop(old_id) # Remove old mapping
             self._original_id_to_internal[new_id] = record.internal_id # Add new mapping
-
+            
             logger.info(f"Updated sequence ID from '{old_id}' to '{new_id}' (InternalID: {record.internal_id}).")
             return True
         logger.warning(f"Sequence ID '{old_id}' not found for ID update.")
@@ -181,7 +181,7 @@ class SequenceData:
             return True
         logger.warning(f"Sequence ID '{seq_id}' not found for sequence data update.")
         return False
-
+        
     def __len__(self) -> int:
         """Returns the number of sequences in the collection."""
         return len(self._sequences)
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     if rec1:
         logger.debug(f"Record 1: {rec1}")
         logger.debug(f"Seq1 internal ID: {seq_data.get_internal_id('seq1')}")
-
+    
     if rec2:
         logger.debug(f"Record 2: {rec2.id}, {rec2.sequence}, {rec2.internal_id}")
 
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     # Test updates
     seq_data.update_sequence_id("seq1", "seq_one_updated")
     if rec1: # rec1 is a reference to the object, its id attribute should change
-         logger.debug(f"Record 1 after ID update: {rec1}")
+         logger.debug(f"Record 1 after ID update: {rec1}") 
     logger.debug(f"Internal ID for seq_one_updated: {seq_data.get_internal_id('seq_one_updated')}")
     logger.debug(f"Original ID for internal ID {rec1.internal_id if rec1 else -1}: {seq_data.get_original_id(rec1.internal_id if rec1 else -1)}")
 
@@ -248,7 +248,7 @@ if __name__ == '__main__':
     assert "seq_one_updated" in seq_data
     assert "seq2" not in seq_data
     assert len(seq_data) == 2 # seq_one_updated and seq3
-
+    
     # Test error handling for SequenceRecord
     try:
         SequenceRecord("", "AGTC", 1)

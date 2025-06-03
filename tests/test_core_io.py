@@ -15,8 +15,8 @@ from treeweaver.core.file_parser import (
 from Bio import Phylo # For creating a test tree object
 
 # Configure logging for tests (optional, can be useful for debugging)
-# logging.basicConfig(level=logging.DEBUG)
-# To avoid logs during normal test runs unless a test fails,
+# logging.basicConfig(level=logging.DEBUG) 
+# To avoid logs during normal test runs unless a test fails, 
 # it's often better to let the test runner handle log capture.
 
 class TestCoreIO(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestCoreIO(unittest.TestCase):
     def setUp(self):
         """Set up temporary files and test data for each test method."""
         self.test_dir = tempfile.TemporaryDirectory()
-
+        
         self.fasta_content = """>seq1 desc1
 ATGCGTAGCATCGATCGATCGATCGATCGATCGATCGATCG
 >seq2 desc2
@@ -54,7 +54,7 @@ END;
         self.phylip_file = self._create_temp_file("test.phy", self.phylip_content_strict)
         self.nexus_file = self._create_temp_file("test.nex", self.nexus_content_basic)
         self.newick_file = self._create_temp_file("test.nwk", self.newick_content)
-
+        
         # Create a SequenceData object for testing writes
         self.seq_data_instance = SequenceData()
         self.seq_data_instance.add_sequence("seq1", "ATGC", "desc1")
@@ -141,7 +141,7 @@ END;
         success = write_fasta(self.seq_data_instance, out_path)
         self.assertTrue(success)
         self.assertTrue(os.path.exists(out_path))
-
+        
         # Verify content by reloading
         reloaded_data = load_sequences(out_path, "fasta")
         self.assertIsNotNone(reloaded_data)
@@ -159,7 +159,7 @@ END;
         self.assertEqual(len(reloaded_data), len(self.seq_data_instance))
         # PHYLIP IDs might be padded/truncated, Biopython handles this on read/write.
         # 'seq1' is short enough not to be truncated.
-        self.assertIsNotNone(reloaded_data.get_sequence_by_id("seq1"))
+        self.assertIsNotNone(reloaded_data.get_sequence_by_id("seq1")) 
         self.assertEqual(reloaded_data.get_sequence_by_id("seq1").sequence, "ATGC")
 
     def test_write_nexus(self):
@@ -190,7 +190,7 @@ END;
         success = write_newick(self.tree_instance, out_path)
         self.assertTrue(success)
         self.assertTrue(os.path.exists(out_path))
-
+        
         reloaded_tree = parse_newick(out_path)
         self.assertIsNotNone(reloaded_tree)
         self.assertEqual(reloaded_tree.count_terminals(), self.tree_instance.count_terminals())

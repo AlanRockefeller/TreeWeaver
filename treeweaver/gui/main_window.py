@@ -1,13 +1,13 @@
 # This module will define the main application window and its layout.
 import sys
 import logging
-import os
-import tempfile
-import functools
+import os 
+import tempfile 
+import functools 
 from pathlib import Path # For path operations
 
 from PyQt6.QtWidgets import (
-    QMainWindow, QApplication, QMenuBar, QMenu, QWidget, QLabel,
+    QMainWindow, QApplication, QMenuBar, QMenu, QWidget, QLabel, 
     QFileDialog, QMessageBox, QStatusBar, QDialog # For dialog.exec comparison
 )
 from PyQt6.QtGui import QAction
@@ -15,10 +15,10 @@ from PyQt6.QtCore import Qt
 
 from .dialogs import SettingsDialog, RaxmlDialog, SequenceEditDialog, HelpDialog
 from .sequence_panel import SequencePanel
-from .tree_canvas import TreeCanvas
+from .tree_canvas import TreeCanvas 
 
 from treeweaver.core import (
-    load_sequences, write_fasta, write_phylip, write_newick,
+    load_sequences, write_fasta, write_phylip, write_newick, 
     write_sequences, SequenceData, parse_newick
 )
 from treeweaver.core.phylogenetics import create_phylip_with_internal_ids, map_raxml_tree_tips_to_original_ids
@@ -34,13 +34,13 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1200, 800)
 
         self.sequence_data: SequenceData | None = None
-        self.tree_data = None
-        self.best_fit_model: str | None = None
-        self.deletion_mode_active = False
+        self.tree_data = None 
+        self.best_fit_model: str | None = None 
+        self.deletion_mode_active = False 
 
         self._createMenuBar()
         self._setupDockWidgets()
-        self._setupStatusBar()
+        self._setupStatusBar() 
 
         self.tree_canvas = TreeCanvas(self)
         self.setCentralWidget(self.tree_canvas)
@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         exit_action = QAction("Exit", self)
         exit_action.setToolTip("Exit the application.")
-        exit_action.triggered.connect(self.close)
+        exit_action.triggered.connect(self.close) 
         file_menu.addAction(exit_action)
 
         # Edit Menu
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         tools_menu.addSeparator()
         run_raxml_ng_action = QAction("Run RAxML-NG (Tree Inference)...", self); run_raxml_ng_action.setToolTip("Infer tree using RAxML-NG.")
         run_raxml_ng_action.triggered.connect(self._run_raxml_ng_tree_inference); tools_menu.addAction(run_raxml_ng_action)
-
+        
         # Help Menu
         help_menu = menu_bar.addMenu("&Help")
         help_content_action = QAction("Help Content...", self)
@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
     def _open_settings_dialog(self):
         logger.debug("Opening Settings dialog.")
-        dialog = SettingsDialog(self)
+        dialog = SettingsDialog(self) 
         if dialog.exec() == QDialog.DialogCode.Accepted: # Use QDialog.DialogCode.Accepted
             logger.info("Settings dialog accepted.")
             if self.tree_data and self.tree_canvas:
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
             settings_manager.update_setting("user_paths.last_import_dir", str(Path(filepath).parent))
             # Use try-except for file loading robustness
             try:
-                loaded_data = load_sequences(filepath)
+                loaded_data = load_sequences(filepath) 
                 if loaded_data and len(loaded_data.get_all_sequences()) > 0:
                     self.sequence_data = loaded_data; self.tree_data = None; self.best_fit_model = None
                     self.model_display_label.setText("Best-fit model: None")
@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
         filepath, selected_filter = QFileDialog.getSaveFileName(self, "Export Alignment", default_filename, file_types)
         if filepath:
             settings_manager.update_setting("user_paths.last_export_dir", str(Path(filepath).parent))
-            fmt = "fasta"
+            fmt = "fasta" 
             if "fasta" in selected_filter.lower(): fmt = "fasta"
             elif "phylip" in selected_filter.lower(): fmt = "phylip"
             elif "nexus" in selected_filter.lower(): fmt = "nexus"
@@ -199,7 +199,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Export Error", f"Failed to export alignment: {e}")
         else: logger.info("Alignment export cancelled.")
 
-    def _export_tree_newick(self):
+    def _export_tree_newick(self): 
         if not self.tree_data: QMessageBox.warning(self, "Export Error", "No tree to export."); return
         file_types = "Newick (*.nwk *.newick *.tre *.tree);;All Files (*)"
         last_dir = settings_manager.get_setting("user_paths.last_export_dir", str(Path.home()))
@@ -208,7 +208,7 @@ class MainWindow(QMainWindow):
         if filepath:
             settings_manager.update_setting("user_paths.last_export_dir", str(Path(filepath).parent))
             try:
-                if write_newick(self.tree_data, filepath):
+                if write_newick(self.tree_data, filepath): 
                     QMessageBox.information(self, "Export Success", f"Tree exported to {os.path.basename(filepath)}.")
                 else: QMessageBox.critical(self, "Export Error", f"Failed to export tree to {os.path.basename(filepath)} (writer function returned false).")
             except Exception as e:
@@ -296,14 +296,14 @@ class MainWindow(QMainWindow):
                 if success and result_or_error and os.path.exists(result_or_error):
                     tree_file_path = result_or_error
                     raw_tree = parse_newick(tree_file_path)
-                    if raw_tree:
+                    if raw_tree: 
                         self.tree_data = map_raxml_tree_tips_to_original_ids(raw_tree,self.sequence_data)
                         QMessageBox.information(self,"RAxML-NG Success","Tree inference complete.")
                         self.tree_canvas.draw_tree(self.tree_data)
-                    else:
+                    else: 
                         QMessageBox.critical(self,"RAxML-NG Error",f"Failed to parse output tree from {os.path.basename(tree_file_path)}."); self.tree_data=None
                         self.tree_canvas.clear_tree()
-                else:
+                else: 
                     error_msg = result_or_error if isinstance(result_or_error, str) else "RAxML-NG failed. Check logs."
                     QMessageBox.critical(self,"RAxML-NG Error", error_msg); self.tree_data=None
                     self.tree_canvas.clear_tree()
@@ -319,21 +319,21 @@ class MainWindow(QMainWindow):
             new_id, new_seq = dialog.get_validated_data()
             id_changed = record.id != new_id; seq_changed = record.sequence != new_seq
             updated = False; current_id_for_seq_update = record.id # Start with original ID
-            if id_changed:
-                if self.sequence_data.update_sequence_id(record.id,new_id):
-                    current_id_for_seq_update = new_id
+            if id_changed: 
+                if self.sequence_data.update_sequence_id(record.id,new_id): 
+                    current_id_for_seq_update = new_id 
                     updated = True
-                else: QMessageBox.critical(self,"Error","Failed to update ID."); return
+                else: QMessageBox.critical(self,"Error","Failed to update ID."); return 
             if seq_changed:
                 if self.sequence_data.update_sequence_string(current_id_for_seq_update, new_seq): updated = True
-                else: QMessageBox.critical(self,"Error","Failed to update sequence string."); return
+                else: QMessageBox.critical(self,"Error","Failed to update sequence string."); return 
             if updated:
                 self.sequence_panel.update_sequences(self.sequence_data)
                 QMessageBox.information(self,"Sequence Updated",f"Sequence '{new_id}' updated.")
                 self.tree_data=None; self.tree_canvas.clear_tree(); self.best_fit_model=None
                 self.model_display_label.setText("Best-fit model: None (Data changed)")
         else: logger.info(f"Edit for '{seq_id}' cancelled.")
-
+    
     def _toggle_deletion_mode(self, checked: bool):
         self.deletion_mode_active = checked
         status_message = f"Deletion Mode {'Activated' if checked else 'Deactivated'}"
@@ -354,15 +354,15 @@ class MainWindow(QMainWindow):
         ids_to_remove = {tip.name for tip in (target_clade.get_terminals() if not is_terminal else [target_clade]) if tip.name}
         for seq_id in ids_to_remove: self.sequence_data.remove_sequence_by_id(seq_id)
         try: self.tree_data.prune(target_clade)
-        except ValueError as e:
+        except ValueError as e: 
              logger.error(f"Error pruning tree: {e}. Setting tree to None.")
-             self.tree_data = None
+             self.tree_data = None 
         self.sequence_panel.update_sequences(self.sequence_data)
-        if self.tree_data and self.tree_data.root and self.tree_data.root.clades:
+        if self.tree_data and self.tree_data.root and self.tree_data.root.clades: 
             self.tree_canvas.draw_tree(self.tree_data)
         else:
             self.tree_canvas.clear_tree(); self.tree_data = None
-            if len(self.sequence_data.get_all_sequences()) == 0:
+            if len(self.sequence_data.get_all_sequences()) == 0: 
                  self.best_fit_model = None; self.model_display_label.setText("Best-fit model: None (Data cleared)")
         self.statusBar.showMessage(f"Deleted '{clade_name_to_delete}'. {len(ids_to_remove)} sequences removed.", 5000)
 

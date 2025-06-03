@@ -14,15 +14,15 @@ class SettingsManager:
         self.app_name = app_name
         self.config_dir = self._get_config_dir()
         self.config_file_path = os.path.join(self.config_dir, "settings.json")
-
+        
         self.default_settings = {
             "external_tool_paths": {
                 "mafft": "",
-                "raxmlng": "",
+                "raxmlng": "", 
                 "iqtree": "",
-                "modeltest-ng": ""
+                "modeltest-ng": "" 
             },
-            "external_tool_options": {
+            "external_tool_options": { 
                 "mafft_threads": 1,
                 "raxmlng_threads": 1,
                 "iqtree_threads": 1,
@@ -39,9 +39,9 @@ class SettingsManager:
                 "last_export_dir": os.path.expanduser("~"),
                 "last_settings_tool_path_dir": os.path.expanduser("~") # For tool path browsing
             },
-            "debug_mode": False
+            "debug_mode": False 
         }
-
+        
         self.settings = self.load_settings()
         logger.info(f"Settings initialized. Config path: {self.config_file_path}")
 
@@ -51,7 +51,7 @@ class SettingsManager:
             config_dir = os.path.join(os.getenv('APPDATA', ''), self.app_name)
         else:  # macOS, Linux, other Unix-like
             config_dir = os.path.join(os.path.expanduser('~'), '.config', self.app_name)
-
+        
         if not os.path.exists(config_dir):
             try:
                 os.makedirs(config_dir, exist_ok=True)
@@ -100,12 +100,12 @@ class SettingsManager:
         try:
             with open(self.config_file_path, 'r') as f:
                 loaded_settings = json.load(f)
-
+            
             # Merge loaded settings with defaults to ensure all keys are present
             # and to handle new default settings added in newer versions.
             # The default_settings structure is the master structure.
             merged_settings = self._deep_merge_dicts(self.default_settings, loaded_settings)
-
+            
             # Ensure no keys from loaded_settings that are not in default_settings get added at the top level
             final_settings = {k: merged_settings[k] for k in self.default_settings if k in merged_settings}
 
@@ -139,8 +139,8 @@ class SettingsManager:
                 logger.error(f"Error creating configuration directory {self.config_dir} during save: {e}")
                 # If creating the primary config dir fails, don't attempt to save.
                 # The constructor should have handled fallback.
-                return False
-
+                return False 
+        
         try:
             with open(self.config_file_path, 'w') as f:
                 json.dump(data_to_save, f, indent=4)
@@ -184,14 +184,14 @@ class SettingsManager:
         """
         keys = key_path.split('.')
         current_level = self.settings
-
+        
         for i, key in enumerate(keys[:-1]):
             if key not in current_level or not isinstance(current_level[key], dict):
                 # If key doesn't exist or is not a dict, create it
                 logger.debug(f"Creating intermediate dictionary for key '{key}' in path '{key_path}'")
                 current_level[key] = {}
             current_level = current_level[key]
-
+        
         # Set the final value
         final_key = keys[-1]
         current_level[final_key] = value
@@ -208,7 +208,7 @@ settings_manager = SettingsManager()
 if __name__ == "__main__":
     # Example Usage and Testing
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
+    
     logger.info("Initial loaded settings:")
     logger.info(json.dumps(settings_manager.settings, indent=2))
 
@@ -221,18 +221,18 @@ if __name__ == "__main__":
     settings_manager.update_setting('external_tool_paths.mafft', '/usr/local/bin/mafft')
     settings_manager.update_setting('visualization.font_size', 12)
     settings_manager.settings['debug_mode'] = True # Direct update also possible, but update_setting is safer for nested keys
-
+    
     logger.info("Settings after updates (in memory):")
     logger.info(json.dumps(settings_manager.settings, indent=2))
-
+    
     if settings_manager.save_settings():
         logger.info("Settings saved successfully.")
-
+        
         # Reload to verify
         new_settings_manager = SettingsManager()
         logger.info("Settings after reloading from file:")
         logger.info(json.dumps(new_settings_manager.settings, indent=2))
-
+        
         # Test that mafft path and font size persisted
         assert new_settings_manager.get_setting('external_tool_paths.mafft') == '/usr/local/bin/mafft'
         assert new_settings_manager.get_setting('visualization.font_size') == 12

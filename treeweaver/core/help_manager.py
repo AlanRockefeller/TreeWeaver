@@ -10,7 +10,7 @@ HELP_MARKDOWN_CONTENT = """
 
 ## Introduction
 
-Welcome to TreeWeaver! This application is designed to help you perform phylogenetic analysis,
+Welcome to TreeWeaver! This application is designed to help you perform phylogenetic analysis, 
 from sequence alignment and model selection to tree inference and visualization.
 
 ## Getting Started
@@ -118,25 +118,25 @@ def get_help_html() -> str:
         # 'toc' generates a table of contents (might need specific markers in MD like [TOC]).
         # 'sane_lists' improves list parsing.
         html_content = markdown.markdown(
-            HELP_MARKDOWN_CONTENT,
-            extensions=['extra', 'nl2br', 'toc', 'sane_lists']
+            HELP_MARKDOWN_CONTENT, 
+            extensions=['extra', 'nl2br', 'toc', 'sane_lists'] 
         )
-
+        
         # Basic CSS for better readability
         styled_html = f"""
         <html>
         <head>
             <meta charset="UTF-8">
             <style>
-                body {{
+                body {{ 
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-                    line-height: 1.6;
-                    padding: 15px;
-                    background-color: #fdfdfd;
+                    line-height: 1.6; 
+                    padding: 15px; 
+                    background-color: #fdfdfd; 
                     color: #333;
                 }}
-                h1, h2, h3, h4 {{
-                    color: #2c3e50;
+                h1, h2, h3, h4 {{ 
+                    color: #2c3e50; 
                     margin-top: 1.5em;
                     margin-bottom: 0.5em;
                 }}
@@ -144,19 +144,19 @@ def get_help_html() -> str:
                 h2 {{ font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.2em; }}
                 h3 {{ font-size: 1.25em; }}
                 h4 {{ font-size: 1.0em; }}
-                code {{
-                    background-color: #ecf0f1;
-                    padding: 0.2em 0.4em;
+                code {{ 
+                    background-color: #ecf0f1; 
+                    padding: 0.2em 0.4em; 
                     margin: 0;
                     font-size: 85%;
-                    border-radius: 3px;
+                    border-radius: 3px; 
                     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
                 }}
-                pre {{
-                    background-color: #ecf0f1;
-                    padding: 10px;
-                    border-radius: 3px;
-                    overflow-x: auto;
+                pre {{ 
+                    background-color: #ecf0f1; 
+                    padding: 10px; 
+                    border-radius: 3px; 
+                    overflow-x: auto; 
                     border: 1px solid #bdc3c7;
                 }}
                 pre code {{ background-color: transparent; padding: 0; }}
@@ -167,11 +167,11 @@ def get_help_html() -> str:
                 table {{ border-collapse: collapse; margin: 1em 0; display: block; overflow-x: auto; }}
                 th, td {{ border: 1px solid #dfe2e5; padding: 0.6em 1em; }}
                 th {{ background-color: #f6f8fa; font-weight: bold; }}
-                blockquote {{
-                    padding: 0 1em;
-                    color: #777;
-                    border-left: 0.25em solid #dfe2e5;
-                    margin-left: 0;
+                blockquote {{ 
+                    padding: 0 1em; 
+                    color: #777; 
+                    border-left: 0.25em solid #dfe2e5; 
+                    margin-left: 0; 
                 }}
                 hr {{ border: none; border-top: 1px solid #dfe2e5; margin: 1.5em 0; }}
             </style>
@@ -190,7 +190,7 @@ def get_help_html() -> str:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     html = get_help_html()
-    # print(html)
+    # print(html) 
     try:
         with open("temp_help_preview.html", "w", encoding="utf-8") as f:
             f.write(html)

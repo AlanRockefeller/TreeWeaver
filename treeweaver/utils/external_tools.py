@@ -57,7 +57,7 @@ def _run_command(command: List[str], cwd: Optional[str] = None, timeout_seconds:
         if process.stdout: logger.debug(f"Command STDOUT:\n{process.stdout.strip()}")
         # Always log stderr for debugging, even on success, as some tools put info there
         if process.stderr: logger.debug(f"Command STDERR:\n{process.stderr.strip()}")
-
+        
         if process.returncode == 0:
             logger.info(f"Command executed successfully: {cmd_str_for_log}")
             return True, process.stdout, process.stderr
@@ -83,14 +83,14 @@ def run_mafft(input_fasta_path: str, output_fasta_path: str, num_threads: int = 
     if not os.path.exists(input_fasta_path):
         logger.error(f"MAFFT input file not found: {input_fasta_path}")
         return False, f"Input FASTA file not found: {input_fasta_path}"
-
+    
     command = [mafft_path, "--thread", str(num_threads), "--auto"]
     if options: command.extend(options)
     command.append(input_fasta_path)
-
+    
     logger.info(f"Running MAFFT: input='{input_fasta_path}', output='{output_fasta_path}'")
     success, stdout_data, stderr_data = _run_command(command)
-
+    
     if success and stdout_data:
         try:
             with open(output_fasta_path, "w") as f: f.write(stdout_data)
@@ -112,8 +112,8 @@ def run_mafft(input_fasta_path: str, output_fasta_path: str, num_threads: int = 
     else: # Tool execution failed
         return False, f"MAFFT execution failed. Error: {stderr_data.strip()[:200] if stderr_data.strip() else 'Unknown error'}"
 
-def run_raxml_ng(alignment_phylip_path: str, model: str, prefix: str,
-                 working_dir: Optional[str] = None, seed: int = 12345, threads: int = 1,
+def run_raxml_ng(alignment_phylip_path: str, model: str, prefix: str, 
+                 working_dir: Optional[str] = None, seed: int = 12345, threads: int = 1, 
                  bootstrap_replicates: int = 0) -> Tuple[bool, Optional[str]]:
     raxml_ng_path = _check_tool_path("raxmlng")
     if not raxml_ng_path: return False, "RAxML-NG executable not found or not configured."
@@ -129,10 +129,10 @@ def run_raxml_ng(alignment_phylip_path: str, model: str, prefix: str,
     elif not os.path.isdir(actual_working_dir):
         try: os.makedirs(actual_working_dir, exist_ok=True)
         except OSError as e: return False, f"Cannot create RAxML-NG working directory '{actual_working_dir}': {e}"
-
+    
     msa_abs_path = os.path.abspath(alignment_phylip_path)
     # RAxML-NG --prefix is an output prefix, not a directory. Files are created in CWD.
-    output_prefix_for_cmd = os.path.basename(prefix)
+    output_prefix_for_cmd = os.path.basename(prefix) 
 
     command = [
         raxml_ng_path, "--msa", msa_abs_path, "--model", model,
@@ -140,14 +140,14 @@ def run_raxml_ng(alignment_phylip_path: str, model: str, prefix: str,
         "--threads", "auto" if threads <=0 else str(threads), "--force",
     ]
     if bootstrap_replicates > 0: command.extend(["--bs-reps", str(bootstrap_replicates)])
-
+    
     logger.info(f"Running RAxML-NG in {actual_working_dir} with prefix {output_prefix_for_cmd}")
     success, stdout, stderr = _run_command(command, cwd=actual_working_dir)
 
     # Expected output file, relative to the CWD of the tool
     best_tree_filename = output_prefix_for_cmd + ".raxml.bestTree"
     best_tree_path_in_cwd = os.path.join(actual_working_dir, best_tree_filename)
-
+    
     # If bootstraps were run, a support tree might be more relevant, e.g., prefix + ".raxml.support"
     # This depends on the RAxML-NG commands used (e.g. if --support was added after a bootstrap run)
     # For now, assume .bestTree is the primary target.
@@ -181,7 +181,7 @@ def run_raxml_ng(alignment_phylip_path: str, model: str, prefix: str,
         logger.error(err_msg)
         if temp_dir_obj: temp_dir_obj.cleanup()
         return False, err_msg
-
+        
     if temp_dir_obj: temp_dir_obj.cleanup()
     return True, final_tree_path
 
@@ -218,7 +218,7 @@ def parse_modeltest_ng_output(modeltest_ng_report_file: str) -> Optional[str]:
     return None
 
 def run_iqtree(alignment_path: str, prefix: str, working_dir: Optional[str] = None,
-               sequence_type: Optional[str] = None, model: Optional[str] = "MFP",
+               sequence_type: Optional[str] = None, model: Optional[str] = "MFP", 
                bootstrap_replicates: int = 0, threads: int = 1,
                run_model_finder_only: bool = False) -> Tuple[bool, Optional[str]]:
     iqtree_path = _check_tool_path("iqtree")
@@ -230,16 +230,16 @@ def run_iqtree(alignment_path: str, prefix: str, working_dir: Optional[str] = No
     elif not os.path.isdir(actual_working_dir):
         try: os.makedirs(actual_working_dir, exist_ok=True)
         except OSError as e: return False, f"Cannot create IQ-TREE working directory: {e}"
-
+    
     msa_abs_path = os.path.abspath(alignment_path)
     output_prefix_for_cmd = os.path.basename(prefix)
     command = [iqtree_path, "-s", msa_abs_path, "--prefix", output_prefix_for_cmd, "-T", str(threads) if threads > 0 else "AUTO", "-redo"]
     if sequence_type: command.extend(["-st", sequence_type])
     current_model_arg = model
-    if run_model_finder_only: current_model_arg = "MFP"
+    if run_model_finder_only: current_model_arg = "MFP" 
     if current_model_arg: command.extend(["-m", current_model_arg])
     if bootstrap_replicates > 0 and not run_model_finder_only: command.extend(["-b", str(bootstrap_replicates)])
-
+    
     success, stdout, stderr = _run_command(command, cwd=actual_working_dir)
     if not success:
         err_summary = stderr.strip()[:200] if stderr.strip() else "Unknown error."
@@ -272,7 +272,7 @@ def run_iqtree(alignment_path: str, prefix: str, working_dir: Optional[str] = No
         return False, f"Tool ran but model parsing failed. Report: {os.path.basename(str(result_data))}"
     return True, result_data # Parsed model string
 
-def run_modeltest_ng(alignment_phylip_path: str, output_base_name: str, working_dir: Optional[str] = None,
+def run_modeltest_ng(alignment_phylip_path: str, output_base_name: str, working_dir: Optional[str] = None, 
                      sequence_type: str = "DNA", threads: int = 1) -> Tuple[bool, Optional[str]]:
     modeltest_ng_path = _check_tool_path("modeltest-ng")
     if not modeltest_ng_path: return False, "ModelTest-NG executable not found."
@@ -287,7 +287,7 @@ def run_modeltest_ng(alignment_phylip_path: str, output_base_name: str, working_
     msa_abs_path = os.path.abspath(alignment_phylip_path)
     output_base_for_cmd = os.path.basename(output_base_name)
     command = [modeltest_ng_path, "-i", msa_abs_path, "-d", sequence_type.lower(), "-p", str(threads), "-o", os.path.join(actual_working_dir, output_base_for_cmd)]
-
+    
     success, stdout, stderr = _run_command(command, cwd=actual_working_dir)
     if not success:
         err_summary = stderr.strip()[:200] if stderr.strip() else "Unknown error."

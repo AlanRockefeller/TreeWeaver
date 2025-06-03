@@ -32,30 +32,61 @@ TreeWeaver is a desktop application designed for biologists and researchers work
 
 ## Installation
 
-1.  **Python Requirement:**
-    *   TreeWeaver requires Python 3.8 or newer.
+### Recommended Setup: Using Conda
 
-2.  **Dependencies:**
-    *   Clone the repository (if applicable) or download the source files.
-    *   Navigate to the project directory in your terminal.
+1.  **Install Conda:** Ensure you have Miniconda or Anaconda installed. If not, download and install it from [https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html).
+2.  **Get TreeWeaver:** Clone the TreeWeaver repository (if you haven't already):
+    ```bash
+    git clone https://github.com/AlanRockefeller/TreeWeaver.git 
+    cd TreeWeaver
+    ```
+    (If you downloaded a source archive, extract it and navigate into the directory).
+3.  **Create Conda Environment:** Create the Conda environment using the provided `environment.yml` file. This will install all necessary Python dependencies with compatible versions:
+    ```bash
+    conda env create -f environment.yml
+    ```
+4.  **Activate Environment:** Activate the new environment:
+    ```bash
+    conda activate treeweaver-env
+    ```
+5.  **Ready to Run:** You are now ready to run TreeWeaver (see 'Running TreeWeaver' section below). Each time you want to run TreeWeaver in a new terminal session, remember to activate the environment using `conda activate treeweaver-env`.
+
+### Alternative Setup: Using pip (Virtual Environment Recommended)
+
+1.  **Python Requirement:**
+    *   TreeWeaver requires Python 3.8 or newer. Ensure it's installed and accessible.
+2.  **Create Virtual Environment (Recommended):**
+    *   It's highly recommended to use a Python virtual environment to manage dependencies:
+        ```bash
+        python -m venv venv_treeweaver
+        source venv_treeweaver/bin/activate  # On Windows: venv_treeweaver\Scripts\activate
+        ```
+3.  **Install Dependencies:**
+    *   Navigate to the project directory in your terminal (where `requirements.txt` is located).
     *   Install required Python packages using pip:
         ```bash
         pip install -r requirements.txt
         ```
     *   This will install `PyQt6`, `biopython`, `matplotlib`, and `markdown`.
+    *   **Note:** While `pip` can be used, Conda is recommended to ensure better compatibility of complex libraries like NumPy and Matplotlib, and to avoid potential conflicts like the NumPy versioning issue (e.g. NumPy 1.x vs 2.x). If using `pip`, ensure your NumPy and Matplotlib versions are compatible. If you encounter issues, try the Conda setup.
 
-3.  **External Tools:**
-    *   TreeWeaver utilizes the following external command-line tools for its analysis capabilities. These must be installed separately by the user:
-        *   **MAFFT:** For multiple sequence alignment. (Search for "MAFFT aligner installation")
-        *   **RAxML-NG:** For phylogenetic tree inference. (Search for "RAxML-NG installation")
-        *   **IQ-TREE:** For phylogenetic tree inference and model selection (ModelFinder). (Search for "IQ-TREE installation")
-        *   **ModelTest-NG:** For substitution model selection. (Search for "ModelTest-NG installation")
-    *   After installation, these tools must either be:
-        *   Available in your system's PATH environment variable.
-        *   Or, their full executable paths must be configured within TreeWeaver via `File > Settings... > External Tools`.
+### External Tools (Required for Analysis Features)
+
+Regardless of how you set up your Python environment (Conda or pip), TreeWeaver relies on the following external command-line tools for its analysis capabilities. These must be installed separately by the user:
+
+*   **MAFFT:** For multiple sequence alignment. (Search for "MAFFT aligner installation")
+*   **RAxML-NG:** For phylogenetic tree inference. (Search for "RAxML-NG installation")
+*   **IQ-TREE:** For phylogenetic tree inference and model selection (ModelFinder). (Search for "IQ-TREE installation")
+*   **ModelTest-NG:** For substitution model selection. (Search for "ModelTest-NG installation")
+
+After installation, these tools must either be:
+*   Available in your system's PATH environment variable.
+*   Or, their full executable paths must be configured within TreeWeaver via `File > Settings... > External Tools`.
 
 ## Running TreeWeaver
 
+*   **If using Conda:** Ensure the `treeweaver-env` environment is activated (`conda activate treeweaver-env`).
+*   **If using pip with a virtual environment:** Ensure your virtual environment is activated.
 *   Navigate to the root directory of TreeWeaver in your terminal.
 *   To run the application:
     ```bash

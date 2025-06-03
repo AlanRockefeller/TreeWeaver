@@ -50,9 +50,9 @@ def load_sequences(filepath: str, file_format: Optional[SEQ_FORMAT_TYPE] = None)
         else:
             logger.error(f"Could not determine file format for: {filepath}. Please specify format.")
             return None
-
+    
     logger.info(f"Attempting to load '{filepath}' as '{detected_format}' format.")
-
+    
     data = SequenceData()
     try:
         # SeqIO.parse returns an iterator. We need to consume it.
@@ -62,7 +62,7 @@ def load_sequences(filepath: str, file_format: Optional[SEQ_FORMAT_TYPE] = None)
             seq_id = bio_record.id
             sequence = str(bio_record.seq)
             description = bio_record.description if bio_record.description != seq_id else ""
-
+            
             if not sequence:
                 logger.warning(f"Sequence '{seq_id}' in '{filepath}' is empty. Skipping.")
                 continue
@@ -70,7 +70,7 @@ def load_sequences(filepath: str, file_format: Optional[SEQ_FORMAT_TYPE] = None)
             added_record = data.add_sequence(seq_id, sequence, description)
             if not added_record:
                 logger.warning(f"Failed to add sequence ID '{seq_id}' from '{filepath}' to SequenceData (likely a duplicate or invalid ID).")
-
+        
         if len(data) == 0:
             logger.warning(f"No sequences loaded from '{filepath}'. The file might be empty or in an incorrect format.")
             return None # Or return empty SequenceData based on desired behavior
@@ -103,7 +103,7 @@ def _convert_to_biopython_seqrecords(sequence_data: SequenceData) -> List[BioSeq
         # Biopython's SeqRecord takes id and description separately.
         # If record.description was `seq1 some description`, id='seq1', description='some description'
         # If record.description was just `seq1`, id='seq1', description=''
-
+        
         # SeqIO.write will typically format the header as ">id description"
         # So, if description contains the id, it might appear duplicated.
         # Let's ensure the description doesn't redundantly include the ID if it's the sole content.
@@ -132,7 +132,7 @@ def write_sequences(sequence_data: SequenceData, filepath: str, file_format: SEQ
         return False
 
     bio_records = _convert_to_biopython_seqrecords(sequence_data)
-
+    
     try:
         # For PHYLIP, Biopython might truncate IDs to 10 characters. This is a limitation of the format.
         # We should warn the user about this if PHYLIP is chosen.
@@ -144,7 +144,7 @@ def write_sequences(sequence_data: SequenceData, filepath: str, file_format: SEQ
                     f"Long IDs in your data will be shortened in '{filepath}'. "
                     f"Consider using FASTA or NEXUS for full ID preservation."
                 )
-
+        
         # For NEXUS, SeqIO can write basic sequence data. For more complex Nexus files (trees, charsets, etc.),
         # one would use Bio.Nexus.Nexus objects directly.
         count = SeqIO.write(bio_records, filepath, file_format)
@@ -229,7 +229,7 @@ def write_newick(tree: Phylo.BaseTree.Tree, filepath: str) -> bool:
 if __name__ == '__main__':
     # Basic testing for file_parser
     logging.basicConfig(level=logging.DEBUG)
-
+    
     # Create dummy files for testing
     test_data_dir = "temp_test_data"
     os.makedirs(test_data_dir, exist_ok=True)
@@ -280,7 +280,7 @@ seq3------ CGTACGTA
     if seq_data_phylip:
         assert len(seq_data_phylip) == 3
         # Biopython's Phylip parser might strip the hyphens from IDs like 'seq1------'
-        assert seq_data_phylip.get_sequence_by_id("seq1").sequence == "ATGCATGC"
+        assert seq_data_phylip.get_sequence_by_id("seq1").sequence == "ATGCATGC" 
         assert seq_data_phylip.get_sequence_by_id("seq2").sequence == "GATTACA-"
         logger.info(f"PHYLIP loaded: {len(seq_data_phylip)} sequences.")
         for rec in seq_data_phylip: logger.debug(rec)
@@ -304,7 +304,7 @@ seq3------ CGTACGTA
         loaded_out_phylip = load_sequences(out_phylip, "phylip")
         # Depending on Biopython's writer, ID "seq1" might become "seq1      " or "seq1"
         # and then read back as "seq1".
-        assert loaded_out_phylip.get_sequence_by_id("seq1") is not None
+        assert loaded_out_phylip.get_sequence_by_id("seq1") is not None 
         logger.info("PHYLIP write test passed (check file for truncation if IDs were long).")
 
 
